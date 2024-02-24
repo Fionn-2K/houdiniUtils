@@ -1,0 +1,14 @@
+{
+    "user1": {
+        "url": "",
+        "port": 5000,
+        "id": 12387,
+        "name": "Eric Thompson",
+        "age": 22,
+        "department": "Technical Art",
+        "role": "Technical Artist",
+        "machine": "Sirius",
+        "email": "Eric.Thompson@email.com",
+        "Line Manager": "Tom Barkley"
+    }
+}
