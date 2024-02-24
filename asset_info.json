@@ -1,0 +1,16 @@
+{
+    "asset1": {
+      "id": "01",
+      "name": "obj1",
+      "link": "https://drive.google.com/file/d/1YWmSkF50lDxIEiH3Yq8yFLVrY6ul9SPG/view?usp=drive_link",
+      "author": "fionn",
+      "company": "2K"
+    },
+    "asset2": {
+      "id": "02",
+      "name": "obj2",
+      "link": "https://docs.google.com/document/d/1836OtRmloeZg-zmM86wU9YVV_FTv4oXtI5uy8-61ThU/edit?usp=drive_link",
+      "author": "fionn",
+      "company": "2K"
+    }
+}
