@@ -10,5 +10,17 @@
         "machine": "Sirius",
         "email": "Eric.Thompson@email.com",
         "Line Manager": "Tom Barkley"
+    },
+    "user2": {
+        "url": "",
+        "port": 1234,
+        "id": 47593,
+        "name": "Fionn Sherrard",
+        "age": 39,
+        "department": "Technical Art",
+        "role": "Technical Artist",
+        "machine": "Fionn.Sherrard",
+        "email": "Fionn.Sherrard@email.com",
+        "Line Manager": "Tom Barkley"
     }
 }

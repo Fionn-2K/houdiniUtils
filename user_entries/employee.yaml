@@ -7,3 +7,13 @@ user1:
   department: "Technical Art"
   role: "Technical Artist"
   machine: "Sirius"
+
+user2:
+  url: ""
+  port: 1234
+  id: 47593
+  name: "Fionn Sherrard"
+  age: 39
+  department: "Technical Art"
+  role: "Technical Artist"
+  machine: "Fionn.Sherrard"
