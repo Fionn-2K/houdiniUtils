@@ -1,3 +1,4 @@
+import hou
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
@@ -9,6 +10,7 @@ class GDriveUpload:
     ## Authenticate Google API
     def authenticate(self):
         gauth = GoogleAuth()
+        gauth.settings['client_config_file'] = hou.pwd().parm("client_file").eval()
         gauth.LocalWebserverAuth()
         return GoogleDrive(gauth)
 
@@ -36,23 +38,26 @@ class GDriveUpload:
         return folder
 
     # Upload sample file
-    def upload_file(self, drive, upload_file, folder_id):
+    def upload_file(self, drive, new_file, file_name, folder_id):
         file = drive.CreateFile(
             {
-                'parents': [{'id': folder_id}]
+                'parents': [{'id': folder_id}],
+                'title': file_name
             }
         )
-        file.SetContentFile(upload_file)
+        file.SetContentFile(new_file)
         file.Upload()
         print("File uploaded")
 
 ## TEST CODE
-if __name__ == "__main__":
-    gu = GDriveUpload()
-    gdrive = gu.authenticate()
+geo = hou.pwd().parm("file").eval()
+new_file_name = geo.split("/")[-1]
 
-    if gdrive is not None:
-        dest_folder_id = gu.get_folder_id(gdrive, "Rebelway")
-        gu.upload_file(gdrive, 'cat_image.jpg', dest_folder_id)
-    else:
-        print("Google drive not authenticated! Failed to upload file")
+gu = GDriveUpload()
+gdrive = gu.authenticate()
+
+if gdrive is not None:
+    dest_folder_id = gu.get_folder_id(gdrive, "Rebelway")
+    gu.upload_file(gdrive, geo, new_file_name, dest_folder_id)
+else:
+    print("Google drive not authenticated! Failed to upload file")
