@@ -8,6 +8,7 @@ import pandas as pd
 from unzipUtils import UnzipUtils
 
 THEME_COLOUR = "#444953"
+SEARCH_FILE_TYPE = "*.obj"
 
 class FolderInterface():
     def __init__(self):
@@ -63,7 +64,7 @@ class FolderInterface():
         fbx_files = []
 
         for x in os.walk(dirpath):
-            for y in glob.glob(os.path.join(x[0],"*.fbx")): # NOTE: get only fbx files
+            for y in glob.glob(os.path.join(x[0],SEARCH_FILE_TYPE)): # NOTE: get only fbx files
                 fbx_files.append(y)
 
         ## hashtable
