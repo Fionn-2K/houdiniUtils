@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import font
 from tkinter import PhotoImage
 from tkinter import messagebox
+from tkinter import Scale
 
 BLACK_COLOUR = "#000000"
 DARKER_GREY = "#141414"
@@ -18,7 +19,7 @@ class MyGUI:
         # self.window.attributes("-alpha", 0.5) ## Transparent
         # self.window.overrideredirect(True) ## Remove title bar
         # self.window.state("zoomed") ## Maximized at start
-        self.window.geometry("500x800")
+        self.window.geometry("500x1000")
         self.window.config(bg=DARKER_GREY)
 
         ## Menu bar
@@ -52,7 +53,7 @@ class MyGUI:
         self.entry.pack()
 
         ## Button
-        self.button_test = tk.Button(self.window, text="Press Me!", font=('Arial', 18))
+        self.button_test = tk.Button(self.window, text="Press Me!", font=('Arial', 18), relief=tk.GROOVE) # relief styles (FLAT,RAISE,SUNKEN,GROOVE,RIDGE)
         self.button_test.pack(pady=10)
 
         ## Frame (Keypad) - START
@@ -120,9 +121,20 @@ class MyGUI:
         self.password_enter_button.grid(row=0, column=1, padx=10)
         self.password_frame.pack(fill="x")
 
-        # ## Listbox
-        # listbox = tk.Listbox(root)
-        # listbox.pack()
+        ## Listbox
+        listbox = tk.Listbox(self.window)
+        listbox.insert(1, "Value 1")
+        listbox.insert(2, "Number 2")
+        listbox.insert(3, "And so on...")
+        listbox.pack()
+
+        ## Slider
+        self.slider_value_1 = tk.DoubleVar()
+        self.horizontal_slider = Scale(self.window, from_=0, to=100, orient=tk.HORIZONTAL, length=400, tickinterval=10, variable=self.slider_value_1, command=self.slider_changed)
+        self.horizontal_slider.pack()
+
+        self.vertical_slider = Scale(self.window, from_=-25, to=25)
+        self.vertical_slider.pack()
 
         self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.window.mainloop()
@@ -146,6 +158,10 @@ class MyGUI:
 
     def clearTextBox(self):
         self.textbox.delete('1.0', tk.END)
+
+    def slider_changed(self, event):
+        print(event)
+
 
     def on_closing(self):
         #TODO: run code
