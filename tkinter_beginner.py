@@ -167,6 +167,14 @@ class MyGUI:
         self.combo_box['state'] = 'readonly' # prevent user from changing values
         self.combo_box.pack()
 
+        ## Treeview
+        treeview_column_names = ("id_number", "first_name", "last_name")
+        self.treeview = ttk.Treeview(self.window, columns=treeview_column_names, show='headings', height=5)
+        self.treeview.heading('id_number', text="ID")
+        self.treeview.heading('first_name', text="First Name")
+        self.treeview.heading('last_name', text="Last Name")
+        self.treeview.pack()
+
 
         self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.window.mainloop()
