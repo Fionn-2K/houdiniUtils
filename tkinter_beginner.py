@@ -1,8 +1,10 @@
 import tkinter as tk
 from tkinter import font
-from tkinter import PhotoImage
 from tkinter import messagebox
+from tkinter import PhotoImage
 from tkinter import Scale
+from tkinter import ttk
+from calendar import month_name
 
 BLACK_COLOUR = "#000000"
 DARKER_GREY = "#141414"
@@ -19,7 +21,7 @@ class MyGUI:
         # self.window.attributes("-alpha", 0.5) ## Transparent
         # self.window.overrideredirect(True) ## Remove title bar
         # self.window.state("zoomed") ## Maximized at start
-        self.window.geometry("500x1000")
+        self.window.geometry("600x1200")
         self.window.config(bg=DARKER_GREY)
 
         ## Menu bar
@@ -41,7 +43,7 @@ class MyGUI:
         self.window.config(menu=self.menubar)
 
         ## Label
-        self.label  = tk.Label(self.window, text="My Test", font=('Bold', 20))
+        self.label  = tk.Label(self.window, text="My Test", font=('Bold', 20), bg=DARK_GREY, fg="white")
         self.label.pack(padx=40, pady=20)
 
         ## Textbox
@@ -53,7 +55,7 @@ class MyGUI:
         self.entry.pack()
 
         ## Button
-        self.button_test = tk.Button(self.window, text="Press Me!", font=('Arial', 18), relief=tk.GROOVE) # relief styles (FLAT,RAISE,SUNKEN,GROOVE,RIDGE)
+        self.button_test = tk.Button(self.window, text="Press Me!", font=('Arial', 18), bd=5, relief=tk.GROOVE) # relief styles (FLAT,RAISE,SUNKEN,GROOVE,RIDGE)
         self.button_test.pack(pady=10)
 
         ## Frame (Keypad) - START
@@ -98,7 +100,7 @@ class MyGUI:
 
         ## Button with image
         self.base_image = PhotoImage(file="images/button_base.png")
-        self.image_button = tk.Button(self.window, text="Image Button", bg="#000000", image=self.base_image, bd=0, compound="center", highlightbackground="#444953", highlightthickness=0)
+        self.image_button = tk.Button(self.window, text="Image Button", bg="#000000", image=self.base_image, bd=0, borderwidth=0, compound="center", highlightbackground="#000000", highlightthickness=0, activebackground=BLACK_COLOUR)
         self.image_button.pack(padx=10, pady=10)
 
         ## Check button
@@ -132,9 +134,39 @@ class MyGUI:
         self.slider_value_1 = tk.DoubleVar()
         self.horizontal_slider = Scale(self.window, from_=0, to=100, orient=tk.HORIZONTAL, length=400, tickinterval=10, variable=self.slider_value_1, command=self.slider_changed)
         self.horizontal_slider.pack()
-
         self.vertical_slider = Scale(self.window, from_=-25, to=25)
         self.vertical_slider.pack()
+
+        ## Radio button
+        radio_value = tk.IntVar()
+        self.radio_button_1 = tk.Radiobutton(self.window, text="Radio Button 1", variable=radio_value, value=1)
+        self.radio_button_1.pack(anchor="nw")
+        self.radio_button_2 = tk.Radiobutton(self.window, text="Radio Button 2", variable=radio_value, value=2)
+        self.radio_button_2.pack(anchor="ne")
+
+        ## Label frame
+        self.label_frame = tk.LabelFrame(self.window, text="My LabelFrame")
+        self.label_frame.pack(fill="both", expand=1)
+        self.label_inside_frame = tk.Label(self.label_frame, text="Label inside of LabelFrame")
+        self.label_inside_frame.pack()
+
+        ## Progress bar / Loading
+        self.progressbar = ttk.Progressbar(variable=self.slider_value_1, maximum=100, mode="indeterminate", orient=tk.HORIZONTAL)
+        self.progressbar.pack(anchor="se")
+
+        ## SpinBox
+        spinbox_value = tk.StringVar(value=0)
+        self.spin_box = tk.Spinbox(self.window, from_=0, to=50, textvariable=spinbox_value, wrap=True)
+        self.spin_box.pack()
+
+        ## ComboBox
+        selected_month = tk.StringVar()
+        self.combo_box = ttk.Combobox(self.window, textvariable=selected_month)
+        self.combo_box['values'] = [month_name[m][0:3] for m in range(1, 13)]
+        self.combo_box.current(0)
+        self.combo_box['state'] = 'readonly' # prevent user from changing values
+        self.combo_box.pack()
+
 
         self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.window.mainloop()
