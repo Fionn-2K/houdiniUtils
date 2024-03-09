@@ -6,5 +6,5 @@ df = pd.DataFrame({
     'second column': [10,20,30,40]
 })
 
-df
+df # DataFrame
 # st.pyplot(df.plot.barh(stacked=True).figure)
