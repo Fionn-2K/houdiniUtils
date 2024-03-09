@@ -1,38 +1,47 @@
 import json
-import pandas as pd
 import requests
 import streamlit as st
 import time
 
 
-## Send a get request to the desired URL
-response = requests.get('https://jsonplaceholder.typicode.com/posts')
+data = []
+counter = 0
 
-data = response.json()
+if data is None:
+    response = requests.get('https://jsonplaceholder.typicode.com/posts')
+    json_data = response.json()
+    with open("placeholder_data.json", "w") as json_file:
+        json.dump(data, json_file, indent=4)
+else:
+    with open("placeholder_data.json", "r") as read_file:
+        data = json.load(read_file)
 
-## write data to json file
-with open("placeholder_data.json", "w") as json_file:
-    json.dump(data, json_file, indent=4)
-
-print("Json file created")
-
-
+## Draw streamlit app
 st.title("Placeholder data")
+st.text("The section below holds placeholder data. It updates ever 4 seconds and loops back to the initial element after 4 iterations.")
 
-# ## display json content
-# st.json({"userId": 1,
-#         "id": 1,
-#         "title": "sunt aut facere repellat provident occaecati excepturi optio reprehenderit",
-#         "body": "quia et suscipit\nsuscipit recusandae consequuntur expedita et cum\nreprehenderit molestiae ut ut quas totam\nnostrum rerum est autem sunt rem eveniet architecto"
-#          })
+## Container holding multiple elements
+placeholder = st.empty()
 
-# ## open json file
-# with open("placeholder_data.json", "r") as jfile:
-#     file = json.load(jfile)
-#     df = pd.json_normalize(file, meta=[
-#         "userId",
-#         "id",
-#         "title",
-#         "body"
-#     ])
-# df
+while True:
+    with placeholder.container():
+        ## Json data
+        st.json(data[counter])
+
+        st.divider()
+
+        ## individual elements
+        st.subheader("User ID")
+        st.text(data[counter]["userId"])
+        st.subheader("ID")
+        st.text(data[counter]["id"])
+        st.subheader("Title")
+        st.text(data[counter]["title"])
+        st.subheader("Body")
+        st.text(data[counter]["body"])
+
+        ## sleep timer
+        time.sleep(5)
+        counter+=1
+        if counter > 3:
+            counter = 0
