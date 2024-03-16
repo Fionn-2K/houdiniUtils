@@ -15,7 +15,7 @@ class USDMigrationUtils:
         fbx_file = [file for file in os.listdir(dir_path) if file.endswith(".fbx")][0]
         print(fbx_file)
 
-        # sopcreate lop node
+        # sopcreate lop node - START
         root_path = "/stage"
         sopcreate_lop = hou.node(root_path).createNode("sopcreate", "asset01")
         sopcreate_lop.parm("enable_partitionattribs").set(0)
@@ -26,11 +26,10 @@ class USDMigrationUtils:
 
         # begin loop
         for_each_begin = file_sop.createOutputNode("block_begin", "foreach_begin1")
-        #for_each_begin.parm("method").set(1)
+        for_each_begin.parm("method").set(1)
         for_each_begin.parm("blockpath").set("../foreach_end1")
         for_each_begin.parm("createmetablock").pressButton()
         meta_node = hou.node(for_each_begin.parent().path() + "/foreach_begin1_metadata1")
-        #meta_node.parm("method").set(2)
         meta_node.parm("blockpath").set("../foreach_end1")
 
         # attribute wrangle node
@@ -54,8 +53,64 @@ class USDMigrationUtils:
         attrib_delete.parm("ptdel").set("fbx_rotation fbx_scale fbx_translation")
         attrib_delete.parm("primdel").set("shop_materialpath MaxHandle name")
 
-        # output node
+        # output node - END
         output_sop = attrib_delete.createOutputNode("output")
+
+        # create primitive lop node
+        primitive_lop = hou.node(root_path).createNode("primitive")
+        primitive_lop.parm("primpath").set("/asset01")
+        primitive_lop.parm("primkind").set("component")
+
+        # graph stages node
+        graph_stage_lop = primitive_lop.createOutputNode("graftstages")
+        graph_stage_lop.setNextInput(sopcreate_lop)
+        graph_stage_lop.parm("primkind").set("subcomponent")
+
+        # material lop
+        materials = ["leaves","leaves_small","trunk","twigs"]
+        materiallib_lop = graph_stage_lop.createOutputNode("materiallibrary")
+        materiallib_lop.parm("materials").set(len(materials))
+
+        for i, material in enumerate(materials):
+                materiallib_lop.parm(f"matnode{i+1}").set(material)
+                materiallib_lop.parm(f"matpath{i+1}").set(f"/asset01/materials/{material}_mat")
+                materiallib_lop.parm(f"assign{i+1}").set(1)
+                materiallib_lop.parm(f"geopath{i + 1}").set(f"/asset01/asset01/{material}")
+
+                # set material network inside
+                mat_network = hou.node(materiallib_lop.path()).createNode("subnet", material)
+
+                #texture maps and node
+                usd_uv_texture = hou.node(mat_network.path()).createNode("usduvtexture::2.0")
+                texture_dir_ref = dir_path
+
+                # get textures
+                if material == "leaves":
+                    texture_map_colour = [file for file in os.listdir(texture_dir_ref) if file.endswith("01.jpg")][0]
+                elif material == "trunk":
+                    texture_map_colour = [file for file in os.listdir(texture_dir_ref) if file.endswith("02.jpg")][0]
+                elif material == "twigs":
+                    texture_map_colour = [file for file in os.listdir(texture_dir_ref) if file.endswith("03.jpg")][0]
+                elif material == "leaves_small":
+                    texture_map_colour = [file for file in os.listdir(texture_dir_ref) if file.endswith("04.jpg")][0]
+
+                # set materials nodes inputs & outputs
+                usd_uv_texture.parm("file").set(texture_dir_ref + "/" + texture_map_colour)
+
+                mtlsurface = hou.node(mat_network.path()).createNode("mtlxstandard_surface")
+                output_ref = hou.node(mat_network.path() + "/suboutput1")
+
+                usd_uv_texture_output = usd_uv_texture.outputIndex("rgb")
+                mtlsurface_input = mtlsurface.inputIndex("base_color")
+                mtlsurface_output = mtlsurface.outputIndex("out")
+
+                mtlsurface.setInput(mtlsurface_input, usd_uv_texture, usd_uv_texture_output)
+                output_ref.setNextInput(mtlsurface, mtlsurface_output)
+
+                mat_network.setMaterialFlag(True) # enable material once done
+
+
+
 
 
 
