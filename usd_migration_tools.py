@@ -3,7 +3,7 @@ import hou
 
 class USDMigrationUtils:
     def __init__(self):
-        pass
+        self.asset_name = None
 
     def test(self):
         print("Hello from USD tools")
@@ -13,11 +13,12 @@ class USDMigrationUtils:
 
         # get the first FBX file in the "dir_path" param.
         fbx_file = [file for file in os.listdir(dir_path) if file.endswith(".fbx")][0]
-        print(fbx_file)
+
+        self.asset_name = fbx_file[:-4] # removed .fbx
 
         # sopcreate lop node - START
         root_path = "/stage"
-        sopcreate_lop = hou.node(root_path).createNode("sopcreate", "asset01")
+        sopcreate_lop = hou.node(root_path).createNode("sopcreate", self.asset_name)
         sopcreate_lop.parm("enable_partitionattribs").set(0)
 
         # file sop node
@@ -58,7 +59,7 @@ class USDMigrationUtils:
 
         # create primitive lop node
         primitive_lop = hou.node(root_path).createNode("primitive")
-        primitive_lop.parm("primpath").set("/asset01")
+        primitive_lop.parm("primpath").set(self.asset_name)
         primitive_lop.parm("primkind").set("component")
 
         # graph stages node
@@ -73,9 +74,9 @@ class USDMigrationUtils:
 
         for i, material in enumerate(materials):
                 materiallib_lop.parm(f"matnode{i+1}").set(material)
-                materiallib_lop.parm(f"matpath{i+1}").set(f"/asset01/materials/{material}_mat")
+                materiallib_lop.parm(f"matpath{i+1}").set(f"/{self.asset_name}/materials/{material}_mat")
                 materiallib_lop.parm(f"assign{i+1}").set(1)
-                materiallib_lop.parm(f"geopath{i + 1}").set(f"/asset01/asset01/{material}")
+                materiallib_lop.parm(f"geopath{i + 1}").set(f"/{self.asset_name}/{self.asset_name}/{material}")
 
                 # set material network inside
                 mat_network = hou.node(materiallib_lop.path()).createNode("subnet", material)
@@ -87,9 +88,9 @@ class USDMigrationUtils:
                 # get textures
                 if material == "leaves":
                     texture_map_colour = [file for file in os.listdir(texture_dir_ref) if file.endswith("01.jpg")][0]
-                elif material == "trunk":
-                    texture_map_colour = [file for file in os.listdir(texture_dir_ref) if file.endswith("02.jpg")][0]
                 elif material == "twigs":
+                    texture_map_colour = [file for file in os.listdir(texture_dir_ref) if file.endswith("02.jpg")][0]
+                elif material == "trunk":
                     texture_map_colour = [file for file in os.listdir(texture_dir_ref) if file.endswith("03.jpg")][0]
                 elif material == "leaves_small":
                     texture_map_colour = [file for file in os.listdir(texture_dir_ref) if file.endswith("04.jpg")][0]
@@ -110,7 +111,9 @@ class USDMigrationUtils:
                 mat_network.setMaterialFlag(True) # enable material once done
 
 
-
+        # usd rop export
+        usd_rop_export = materiallib_lop.createOutputNode("usd_rop")
+        usd_rop_export.parm("lopoutput").set(dir_path + "/usd_export/" + self.asset_name + ".usd")
 
 
 
