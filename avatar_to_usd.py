@@ -26,8 +26,6 @@ class RPMAvatarToUsd:
         hierarchy_node.parm("importcustomattributes").set(0)
         hierarchy_node.parm("buildscene").pressButton()
 
-        # self.createTemplate()
-
     ## Create ReadyPlayerMe avatar to USD template. Export USD at the end.
     def createTemplate(self):
         ## SOP create
@@ -43,7 +41,26 @@ class RPMAvatarToUsd:
         graft_stage.setNextInput(sop_create)
         graft_stage.parm("primkind").set("subcomponent")
 
-        ##TODO material library & usd export
+        # material library
+        material_lib = graft_stage.createOutputNode("materiallibrary")
+        material_lib.parm("matnet").set(self.obj_path + "/" + self.asset_name + "/materials")
+        material_lib.parm("materials").set(0)
+        material_lib.parm("fillmaterials").pressButton()
+
+        geo_path = "/" + self.prim_path_prefix + self.asset_name + "/" + self.sop_prefix + self.asset_name + "/"
+
+        # loop through materials and assign geometry path
+        for i in range(material_lib.parm("materials").eval()):
+            geo = material_lib.parm(f"matpath{i + 1}").eval()
+            material_lib.parm(f"geopath{i + 1}").set(geo_path + geo)
+
+        # usd export
+        usd_export = material_lib.createOutputNode("usd_rop")
+        usd_export.parm("lopoutput").set(self.dir_path + "/USD_export/" + self.asset_name + ".usd")
+        usd_export.parm("execute").pressButton()
+
+        # tidy/organise stage
+        hou.node(self.stage_path).layoutChildren()
 
     ## Create SOP Create node
     def createSop(self):
@@ -71,8 +88,6 @@ class RPMAvatarToUsd:
 
         return sop_create
 
-
     def execute(self):
-        # self.importReadyPlayerMeAvatar() # use await?
+        self.importReadyPlayerMeAvatar()  # use await?
         self.createTemplate()
-
